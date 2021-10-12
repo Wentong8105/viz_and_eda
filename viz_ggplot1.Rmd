@@ -179,6 +179,9 @@ ggsave("./results/weather_plot.pdf", weather_plot, width = 8, height = 5)
 What about embedding...
 
 ```{r, fig.width=6, fig.height=3}
-weather_plot
+weather_df %>% 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = .5) +
+  facet_grid(. ~ name)
 ```
 
