@@ -59,6 +59,106 @@ weather_df %>%
   group_by(name, month)
 ```
 
+## counting things
+
+count month observations
+
+```{r}
+weather_df %>% 
+  group_by(name,month) %>% 
+  summarize(b_obs = n())
+```
+
+we can use `count()`
+
+```{r}
+weather_df %>% 
+  count(month, name = "n_obs")
+```
+
+**NEVER** use base R's `table`
+
+```{r, eval=FALSE}
+weather_df %>% 
+  pull(month) %>% 
+  table()
+```
+
+other helpful counters
+weather_df %>% 
+  group_by(name,month) %>% 
+  summarize(b_obs = n())
+```{r}
+weather_df %>% 
+  group_by(name,month) %>% 
+  summarize(
+    n_obs = n(),
+    n_days = n_distinct(date))
+```
+## A digression on 2*2 tables
+
+```{r}
+weather_df %>% 
+  filter(name != "Waikiki_HA") %>% 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not cold",
+      TRUE      ~ " "
+    )
+  ) %>% 
+  janitor::tabyl(name, cold)
+```
+
+## General summaries
+
+You can do lots of summaries.
+
+```{r}
+weather_df %>% 
+  group_by(month) %>% 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    mean_prcp = mean(prcp, na.rm = TRUE),
+    median_tmin = median(tmin, na.rm = TRUE)
+  )
+```
+
+This is a dataframe!
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    mean_prcp = mean(prcp, na.rm = TRUE),
+    median_tmin = median(tmin, na.rm = TRUE)
+  ) %>% 
+  ggplot(aes(x = month, y = mean_tmax, color = name)) +
+  geom_point() +
+  geom_line()
+```
+
+Suppose you want to summarise many columns.
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(across(prcp:tmin, mean))
+```
+
+Reminder: sometimes yoru results are easier to read in another format.
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(mean_tmax = mean(tmax)) %>% 
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax
+  ) %>% 
+  knitr::kable(digits = 1)
+```
 
 
 
